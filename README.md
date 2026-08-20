@@ -61,9 +61,7 @@ Bank__InvalidAddress	()	Supplying address(0) as recipient or admin
 Bank__ZeroAmount	()	Submitting transactions with 0 value
 Bank__TransferFailed	()	Low-level .call execution reverted
 
-├── contracts/
-│   └── CryptoBank.sol
-└── README.md
+
 
 Deployment & Interaction (Remix IDE)
 Open CryptoBank.sol in Remix and compile with Solidity 0.8.36.
