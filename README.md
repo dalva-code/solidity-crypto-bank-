@@ -33,3 +33,28 @@ Internal Transfer (transferInternal): Zero-overhead ledger transfer between vaul
 Automated ETH Fallbacks: Dedicated receive() and fallback() methods routing direct incoming Ether straight to user deposits.
 Gas Optimization: Replaced expensive revert strings with parameterized top-level Custom Errors.
 Storage & Access Control: Immutable admin variable and parameterized maxBalance deposit ceilings.
+
+
+Custom Errors Reference
+Custom Error	Parameter Signature	Trigger Condition
+Bank__NotAdmin	()	Caller is not the contract administrator
+Bank__InsufficientBalance	(uint256 available, uint256 required)	Attempting to withdraw or transfer more than user balance
+Bank__MaxBalanceExceeded	(uint256 currentBalance, uint256 incoming, uint256 limit)	Operation exceeds the maximum allowed account cap
+Bank__InvalidAddress	()	Supplying address(0) as recipient or admin
+Bank__ZeroAmount	()	Submitting transactions with 0 value
+Bank__TransferFailed	()	Low-level .call execution reverted
+
+├── contracts/
+│   └── CryptoBank.sol
+└── README.md
+
+Deployment & Interaction (Remix IDE)
+Open CryptoBank.sol in Remix and compile with Solidity 0.8.36.
+Under Deploy & Run Transactions:
+maxBalance_: Initial account cap in Wei (e.g., 5000000000000000000 for 5 ETH).
+admin_: Your administrator wallet address.
+Click Transact to deploy.
+Interactions:
+Deposit: Set Value field (e.g., 1 Ether) and call deposit().
+Withdraw: Keep Value at 0 Wei and pass the withdrawal amount in Wei to withdraw(amount_).
+Internal Transfer: Keep Value at 0 Wei and call transferInternal(recipient, amount).
