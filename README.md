@@ -26,14 +26,31 @@ A secure, gas-optimized multi-user vault smart contract written in Solidity `0.8
 │ └─────────────────────────────────────┘ │
 └─────────────────────────────────────────┘
 ```
-Checks-Effects-Interactions (CEI) Pattern: Guarantees immunity against Reentrancy attacks by reducing internal accounting state prior to external ETH execution (.call).
-Dual Transfer Mechanics:
-External Withdrawal (withdraw / withdrawTo): Sends native Ether back to the caller or a third-party recipient address.
-Internal Transfer (transferInternal): Zero-overhead ledger transfer between vault accounts modifying contract storage without moving native ETH.
-Automated ETH Fallbacks: Dedicated receive() and fallback() methods routing direct incoming Ether straight to user deposits.
-Gas Optimization: Replaced expensive revert strings with parameterized top-level Custom Errors.
-Storage & Access Control: Immutable admin variable and parameterized maxBalance deposit ceilings.
 
+### 1. Checks-Effects-Interactions (CEI) & Native Withdrawals
+- **Standard Withdrawal (`withdraw`):** Transfers native ETH back to `msg.sender`.
+- **Delegated Withdrawal (`withdrawTo`):** Sends native ETH directly to a third-party recipient address.
+- **Reentrancy Protection:** Decrements `userBalance[msg.sender]` in storage *before* executing the low-level `.call{value: amount}("")`.
+
+### 2. Internal Ledger Settlement (`transferInternal`)
+- **Zero ETH Overhead:** Allows users to transfer funds between accounts inside the bank without triggering native ETH transfers.
+- **Gas Optimized:** Executes as an internal state re-allocation (`sender -= amount`, `recipient += amount`), enforcing individual `maxBalance` limits on the receiver.
+
+### 3. Automated ETH Fallback Routing
+- **`receive()` & `fallback()`:** Captures direct plain ETH transactions sent to the contract address and routes them automatically to `deposit()`, crediting the sender's account.
+
+### 4. Gas-Optimized Error Handling
+- Replaced classic `require(..., "string")` statements with top-level parameterized **Custom Errors** (`error Bank__...`), reducing bytecode size and gas costs on transaction reverts.
+
+---
+
+## 🛠️ File Structure
+
+```text
+├── contracts/
+│   └── CryptoBank.sol
+└── README.md
+```
 
 Custom Errors Reference
 Custom Error	Parameter Signature	Trigger Condition
